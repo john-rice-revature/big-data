@@ -2,11 +2,10 @@ package csvreadwrite
 import scala.io.StdIn
 import scala.util.matching.Regex
 import java.io.FileNotFoundException
-
 import com.mongodb.client.model.Filters
-import org.mongodb.scala.model.Filters.{exists, _}
-import csvreadwrite.DBDriver.{collection, db}
-import org.mongodb.scala.{Document, model}
+import org.mongodb.scala.model.Filters.{_}
+import csvreadwrite.DBDriver.{collection}
+
 
 
 
@@ -48,7 +47,7 @@ class Cli {
             printMenuOptions()
 
             //user input: upload CSV file to DB
-            StdIn.readLine() match{
+            StdIn.readLine() match {
                 case userInputFormat(cmd, arg) if cmd.equals("upload") =>
                     try {
                         CSVParser.parseCSV(arg)
