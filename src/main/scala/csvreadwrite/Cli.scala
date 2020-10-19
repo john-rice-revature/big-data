@@ -3,40 +3,28 @@ import scala.io.StdIn
 import scala.util.matching.Regex
 import java.io.FileNotFoundException
 import com.mongodb.client.model.Filters
-import org.mongodb.scala.model.Filters.{_}
-import csvreadwrite.DBDriver.{collection}
-
-
-
+import org.mongodb.scala.model.Filters._
+import csvreadwrite.DBDriver.collection
 
 class Cli {
 
     val userInputFormat : Regex = "(\\w+)\\s*(.*)".r
 
     def printWelcome(): Unit = {
-        for (repeat <- 1 to 8) {
+        for (repeat <- 1 to 3) {
             println("Welcome to the CSV Parser / Reader. This CSV Parser/Reader can also connect to MongoDB and store" +
                 " your contacts in the database!")
-            Thread.sleep(300)
+            Thread.sleep(500)
         }
     }
 
     def printMenuOptions(): Unit = {
         println("SELECT AN OPTION FROM BELOW")
-        println("")
         println("upload [csv file] : select .csv file to parse & insert into DB")
         println("add : add contact to DB")
-        println("view: view DB contacts")
+        println("view : view DB contacts")
         println("remove : remove specific contacts or all contacts from DB")
         println("exit : exit the application")
-
-
-       /** FEATURES BELOW THAT HAVE YET TO BE IMPLEMENTED
-
-        - The ability to Search through the DB.
-
-       */
-
     }
 
     def userMenu(): Unit = {
@@ -49,45 +37,27 @@ class Cli {
 
             //user input: upload CSV file to DB
             StdIn.readLine() match {
-                case userInputFormat(cmd, arg) if cmd.equals("upload") =>
+                case userInputFormat(cmd, arg) if cmd.contentEquals("upload") =>
                     try {
                         CSVParser.parseCSV(arg)
                     } catch {
                         case fnf : FileNotFoundException => println(s"Failed to find .CSV file '$arg'")
+                        case mr : MatchError => println("Some unknown match error occurred. Please run the program again.")
                     }
-
-                /** VIEW CONTACT SECTION */
-
-                //user input: view contacts in DB
-                case userInputFormat(cmd, arg) if cmd.equalsIgnoreCase("view") => {
-                        println("Would you like to view all your contacts or specific one? Type 'all' or 'one'.")
-                    StdIn.readLine() match {
-                        case "all" => DBDriver.printResults(collection.find())
-                            println("Results: Full contact list displayed")
-                        case "one" => println("Please type the full name of the contact you are looking for.")
-                        val searchContactName = StdIn.readLine()
-                            println("RESULTS ARE AS FOLLOWS:")
-                            DBDriver.printResults(collection.find(equal("name", searchContactName)))
-                            println(searchContactName + " was successfully located.")
-                        case notRecognized => println(s"$notRecognized is an invalid answer! Try again.")
-                    }
-
-
-                }
 
 
                 /** ADD CONTACT SECTION  */
 
                 //user input: add a contact to DB
-                case userInputFormat(cmd, arg) if cmd.equalsIgnoreCase("add") => {
-                        println("What is the contact's name? ")
+                case userInputFormat(cmd, arg) if cmd.equalsIgnoreCase("add") =>
+                    println("What is the contact's name?")
                     val nameInput = StdIn.readLine()
-                        println("What is the contact's phone number? (enter only numbers, no country code) ")
+                    println("What is the contact's phone number? (enter only numbers, no country code)")
                     val phoneInput = StdIn.readLine()
-                        println("Are they friends, family, or co-workers? Enter one.")
+                    println("Are they friends, family, or co-workers? Enter one.")
                     val groupInput = StdIn.readLine()
-                        println("You're adding the '" +nameInput + "' with the phone number of '"
-                    + phoneInput + "' to the contact group '" +groupInput + "'. Is this correct? Type 'yes' or 'no'.")
+                    println("You're adding the '" +nameInput + "' with the phone number of '"
+                + phoneInput + "' to the contact group '" +groupInput + "'. Is this correct? Type 'yes' or 'no'.")
                     StdIn.readLine() match {
                         case "yes" => DBDriver.printResults(collection.insertOne(Contact(nameInput, phoneInput, groupInput)))
                             println("Your contact "+nameInput+ " has been successfully added to the database!")
@@ -97,12 +67,31 @@ class Cli {
                         case notRecognized => println(s"$notRecognized is an invalid answer! Try again.")
                     }
 
-                }
+                /** VIEW CONTACT SECTION */
+
+                //user input: view contacts in DB
+                case userInputFormat(cmd, arg) if cmd.equalsIgnoreCase("view") =>
+                    println("Would you like to view all your contacts or specific one? Type 'all' or 'one'.")
+                    StdIn.readLine() match {
+                        case "all" => if (DBDriver.getResults(collection.find()).isEmpty) println("Your contacts DB is empty. Please try " +
+                            "Uploading a .csv or add contacts one by one.")
+                        else {
+                            DBDriver.printResults(collection.find())
+                            println("Results: Full contact list displayed")
+                        }
+                        case "one" => println("Please type the full name of the contact you are looking for.")
+                            val searchContactName = StdIn.readLine()
+                            println("RESULTS ARE AS FOLLOWS:")
+                            DBDriver.printResults(collection.find(equal("name", searchContactName)))
+                            println(searchContactName + " was successfully located.")
+                        case notRecognized => println(s"$notRecognized is an invalid answer! Try again.")
+                    }
+
 
                 /** REMOVE CONTACT SECTION  */
 
                 //user input: remove one or all contacts from DB
-                case userInputFormat(cmd, arg) if cmd.equalsIgnoreCase("remove") => {
+                case userInputFormat(cmd, arg) if cmd.equalsIgnoreCase("remove") =>
                     println("Do you want to delete all contacts or a specific one? Type 'all' or 'one'.")
                     StdIn.readLine() match {
                         case "all" =>
@@ -130,7 +119,6 @@ class Cli {
                                 case notRecognized => println(s"$notRecognized is an invalid answer! Try again typing 'yes' or 'no'.")
                                             }
                                     }
-                    }
 
                 //user input: exit program
                 case userInputFormat(cmd, arg) if cmd.equalsIgnoreCase("exit") =>
