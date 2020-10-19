@@ -33,6 +33,7 @@ class Cli {
 
        /** FEATURES BELOW THAT HAVE YET TO BE IMPLEMENTED
 
+        - The ability to Search through the DB.
 
        */
 
@@ -55,9 +56,27 @@ class Cli {
                         case fnf : FileNotFoundException => println(s"Failed to find .CSV file '$arg'")
                     }
 
+                /** VIEW CONTACT SECTION */
+
                 //user input: view contacts in DB
-                case userInputFormat(cmd, arg) if cmd.equalsIgnoreCase("view") =>
-                    DBDriver.printResults(collection.find())
+                case userInputFormat(cmd, arg) if cmd.equalsIgnoreCase("view") => {
+                        println("Would you like to view all your contacts or specific one? Type 'all' or 'one'.")
+                    StdIn.readLine() match {
+                        case "all" => DBDriver.printResults(collection.find())
+                            println("Results: Full contact list displayed")
+                        case "one" => println("Please type the full name of the contact you are looking for.")
+                        val searchContactName = StdIn.readLine()
+                            println("RESULTS ARE AS FOLLOWS:")
+                            DBDriver.printResults(collection.find(equal("name", searchContactName)))
+                            println(searchContactName + " was successfully located.")
+                        case notRecognized => println(s"$notRecognized is an invalid answer! Try again.")
+                    }
+
+
+                }
+
+
+                /** ADD CONTACT SECTION  */
 
                 //user input: add a contact to DB
                 case userInputFormat(cmd, arg) if cmd.equalsIgnoreCase("add") => {
@@ -75,10 +94,12 @@ class Cli {
                             println("")
                         case "no" => println("No new contacts were added. Please try again.")
                             println("")
-                        case notRecognized => println(s"$notRecognized is an invalid answer! Try again typing 'yes' or 'no'.")
+                        case notRecognized => println(s"$notRecognized is an invalid answer! Try again.")
                     }
 
                 }
+
+                /** REMOVE CONTACT SECTION  */
 
                 //user input: remove one or all contacts from DB
                 case userInputFormat(cmd, arg) if cmd.equalsIgnoreCase("remove") => {
