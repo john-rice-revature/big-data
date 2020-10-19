@@ -11,10 +11,10 @@ class Cli {
     val userInputFormat : Regex = "(\\w+)\\s*(.*)".r
 
     def printWelcome(): Unit = {
-        for (repeat <- 1 to 3) {
+        for (repeat <- 1 to 2) {
             println("Welcome to the CSV Parser / Reader. This CSV Parser/Reader can also connect to MongoDB and store" +
                 " your contacts in the database!")
-            Thread.sleep(500)
+            Thread.sleep(400)
         }
     }
 
@@ -44,7 +44,6 @@ class Cli {
                         case fnf : FileNotFoundException => println(s"Failed to find .CSV file '$arg'")
                         case mr : MatchError => println("Some unknown match error occurred. Please run the program again.")
                     }
-
 
                 /** ADD CONTACT SECTION  */
 
@@ -123,7 +122,7 @@ class Cli {
                 //user input: exit program
                 case userInputFormat(cmd, arg) if cmd.equalsIgnoreCase("exit") =>
                     userMenuLoop = false
-                //case notRecognized => println(s"$notRecognized not a recognized command!")
+                case notRecognized => println(s"$notRecognized")
             }
         }
 
