@@ -35,6 +35,8 @@ class Cli {
         while(userMenuLoop) {
             printMenuOptions()
 
+            /** UPLOAD CSV SECTION */
+
             //user input: upload CSV file to DB
             StdIn.readLine() match {
                 case userInputFormat(cmd, arg) if cmd.contentEquals("upload") =>
