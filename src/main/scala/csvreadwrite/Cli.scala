@@ -75,14 +75,17 @@ class Cli {
                         case "all" => if (DBDriver.getResults(collection.find()).isEmpty) println("Your contacts DB is empty. Please try " +
                             "Uploading a .csv or add contacts one by one.")
                         else {
-                            DBDriver.printResults(collection.find())
+                            println("")
                             println("Results: Full contact list displayed")
+                            DBDriver.printResults(collection.find())
                         }
                         case "one" => println("Please type the full name of the contact you are looking for.")
                             val searchContactName = StdIn.readLine()
+                            println("")
                             println("RESULTS ARE AS FOLLOWS:")
                             DBDriver.printResults(collection.find(equal("name", searchContactName)))
                             println(searchContactName + " was successfully located.")
+                            println("")
                         case notRecognized => println(s"$notRecognized is an invalid answer! Try again.")
                     }
 
@@ -105,9 +108,14 @@ class Cli {
                             }
                         case "one" => println("What is the name of the contact you'd like to remove?")
                             val delContactName = StdIn.readLine()
-                            DBDriver.printResults(collection.find(equal("name", delContactName)))
-                            println("^^^ FOUND CONTACT ^^^")
-                            println("Is this the contact you want to delete above?")
+                            if (DBDriver.getResults(collection.find(equal("name", delContactName))).isEmpty)
+                               println("Could not find this contact in your database")
+                                 else {
+                                    println("")
+                                    DBDriver.printResults(collection.find(equal("name", delContactName)))
+                                    println("^^^ FOUND CONTACT ^^^")
+                                    println("Is this the contact you want to delete above?")
+                            }
                             StdIn.readLine() match {
                                 case "yes" => DBDriver.printResults(collection.deleteOne(equal("name", delContactName)))
                                             println("You successfully deleted '" + delContactName + "' from your contacts " +
