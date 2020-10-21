@@ -11,7 +11,7 @@ class Cli {
     val userInputFormat : Regex = "(\\w+)\\s*(.*)".r
 
     def printWelcome(): Unit = {
-        for (repeat <- 1 to 2) {
+        for (repeat <- 1 to 4) {
             println("Welcome to the CSV Parser / Reader. This CSV Parser/Reader can also connect to MongoDB and store" +
                 " your contacts in the database!")
             Thread.sleep(400)
@@ -19,12 +19,14 @@ class Cli {
     }
 
     def printMenuOptions(): Unit = {
-        println("SELECT AN OPTION FROM BELOW")
+        println("**********")
+        println("Choose what you'd like to do below:")
         println("upload [csv file] : select .csv file to parse & insert into DB")
         println("add : add contact to DB")
         println("view : view DB contacts")
         println("remove : remove specific contacts or all contacts from DB")
         println("exit : exit the application")
+        println("**********")
     }
 
     def userMenu(): Unit = {
